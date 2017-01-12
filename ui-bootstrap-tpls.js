@@ -1552,7 +1552,7 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
         $scope.$watch('datepickerOptions.' + key, function(value) {
           if (value) {
             if (angular.isDate(value)) {
-              self[key] = dateParser.fromTimezone(new Date(value), ngModelOptions.timezone);
+              self[key] = dateParser.fromTimezone(new Date(value), ngModelOptions.getOption('timezone'));
             } else {
               if ($datepickerLiteralWarning) {
                 $log.warn('Literal date support has been deprecated, please switch to date object usage');
@@ -1562,7 +1562,7 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
             }
           } else {
             self[key] = datepickerConfig[key] ?
-              dateParser.fromTimezone(new Date(datepickerConfig[key]), ngModelOptions.timezone) :
+              dateParser.fromTimezone(new Date(datepickerConfig[key]), ngModelOptions.getOption('timezone')) :
               null;
           }
 
@@ -1613,10 +1613,10 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
       $scope.datepickerOptions.ngModelOptions ||
       datepickerConfig.ngModelOptions;
     if ($scope.datepickerOptions.initDate) {
-      self.activeDate = dateParser.fromTimezone($scope.datepickerOptions.initDate, ngModelOptions.timezone) || new Date();
+      self.activeDate = dateParser.fromTimezone($scope.datepickerOptions.initDate, ngModelOptions.getOption('timezone')) || new Date();
       $scope.$watch('datepickerOptions.initDate', function(initDate) {
         if (initDate && (ngModelCtrl.$isEmpty(ngModelCtrl.$modelValue) || ngModelCtrl.$invalid)) {
-          self.activeDate = dateParser.fromTimezone(initDate, ngModelOptions.timezone);
+          self.activeDate = dateParser.fromTimezone(initDate, ngModelOptions.getOption('timezone'));
           self.refreshView();
         }
       });
@@ -1626,8 +1626,8 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
 
     var date = ngModelCtrl.$modelValue ? new Date(ngModelCtrl.$modelValue) : new Date();
     this.activeDate = !isNaN(date) ?
-      dateParser.fromTimezone(date, ngModelOptions.timezone) :
-      dateParser.fromTimezone(new Date(), ngModelOptions.timezone);
+      dateParser.fromTimezone(date, ngModelOptions.getOption('timezone')) :
+      dateParser.fromTimezone(new Date(), ngModelOptions.getOption('timezone'));
 
     ngModelCtrl.$render = function() {
       self.render();
@@ -1640,7 +1640,7 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
           isValid = !isNaN(date);
 
       if (isValid) {
-        this.activeDate = dateParser.fromTimezone(date, ngModelOptions.timezone);
+        this.activeDate = dateParser.fromTimezone(date, ngModelOptions.getOption('timezone'));
       } else if (!$datepickerSuppressError) {
         $log.error('Datepicker directive: "ng-model" value must be a Date object');
       }
@@ -1657,7 +1657,7 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
       }
 
       var date = ngModelCtrl.$viewValue ? new Date(ngModelCtrl.$viewValue) : null;
-      date = dateParser.fromTimezone(date, ngModelOptions.timezone);
+      date = dateParser.fromTimezone(date, ngModelOptions.getOption('timezone'));
       ngModelCtrl.$setValidity('dateDisabled', !date ||
         this.element && !this.isDisabled(date));
     }
@@ -1665,9 +1665,9 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
 
   this.createDateObject = function(date, format) {
     var model = ngModelCtrl.$viewValue ? new Date(ngModelCtrl.$viewValue) : null;
-    model = dateParser.fromTimezone(model, ngModelOptions.timezone);
+    model = dateParser.fromTimezone(model, ngModelOptions.getOption('timezone'));
     var today = new Date();
-    today = dateParser.fromTimezone(today, ngModelOptions.timezone);
+    today = dateParser.fromTimezone(today, ngModelOptions.getOption('timezone'));
     var time = this.compare(date, today);
     var dt = {
       date: date,
@@ -1713,9 +1713,9 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
 
   $scope.select = function(date) {
     if ($scope.datepickerMode === self.minMode) {
-      var dt = ngModelCtrl.$viewValue ? dateParser.fromTimezone(new Date(ngModelCtrl.$viewValue), ngModelOptions.timezone) : new Date(0, 0, 0, 0, 0, 0, 0);
+      var dt = ngModelCtrl.$viewValue ? dateParser.fromTimezone(new Date(ngModelCtrl.$viewValue), ngModelOptions.getOption('timezone')) : new Date(0, 0, 0, 0, 0, 0, 0);
       dt.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
-      dt = dateParser.toTimezone(dt, ngModelOptions.timezone);
+      dt = dateParser.toTimezone(dt, ngModelOptions.getOption('timezone'));
       ngModelCtrl.$setViewValue(dt);
       ngModelCtrl.$render();
     } else {
@@ -2852,13 +2852,13 @@ function($scope, $element, $attrs, $compile, $log, $parse, $window, $document, $
           value = new Date(value);
         }
 
-        $scope.date = dateParser.fromTimezone(value, ngModelOptions.timezone);
+        $scope.date = dateParser.fromTimezone(value, ngModelOptions.getOption('timezone'));
 
         return dateParser.filter($scope.date, dateFormat);
       });
     } else {
       ngModel.$formatters.push(function(value) {
-        $scope.date = dateParser.fromTimezone(value, ngModelOptions.timezone);
+        $scope.date = dateParser.fromTimezone(value, ngModelOptions.getOption('timezone'));
         return value;
       });
     }
@@ -2910,7 +2910,7 @@ function($scope, $element, $attrs, $compile, $log, $parse, $window, $document, $
 
   $scope.isDisabled = function(date) {
     if (date === 'today') {
-      date = dateParser.fromTimezone(new Date(), ngModelOptions.timezone);
+      date = dateParser.fromTimezone(new Date(), ngModelOptions.getOption('timezone'));
     }
 
     var dates = {};
@@ -2967,7 +2967,7 @@ function($scope, $element, $attrs, $compile, $log, $parse, $window, $document, $
         date = new Date($scope.date);
         date.setFullYear(today.getFullYear(), today.getMonth(), today.getDate());
       } else {
-        date = dateParser.fromTimezone(today, ngModelOptions.timezone);
+        date = dateParser.fromTimezone(today, ngModelOptions.getOption('timezone'));
         date.setHours(0, 0, 0, 0);
       }
     }
@@ -3058,7 +3058,7 @@ function($scope, $element, $attrs, $compile, $log, $parse, $window, $document, $
     if (angular.isString(viewValue)) {
       var date = parseDateString(viewValue);
       if (!isNaN(date)) {
-        return dateParser.toTimezone(date, ngModelOptions.timezone);
+        return dateParser.toTimezone(date, ngModelOptions.getOption('timezone'));
       }
     }
 
